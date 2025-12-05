@@ -62,8 +62,18 @@
         .btn-mini { border: none; font-size: 10px; padding: 3px 6px; border-radius: 3px; cursor: pointer; color: white; font-weight: bold; }
         .btn-upload { background-color: #f39c12; }
         .btn-link { background-color: #3498db; }
-        .btn-manage { background-color: #9b59b6; } /* Màu tím cho nút quản lý */
+        .btn-manage { background-color: #9b59b6; }
+        .btn-collect { background-color: #27ae60; } 
         .btn-mini:hover { opacity: 0.8; box-shadow: 1px 1px 3px rgba(0,0,0,0.2); }
+
+        /* History Viewer Styles */
+        .history-year-block { margin-bottom: 15px; border: 1px solid #ccc; padding: 10px; border-radius: 5px; background: #f9f9f9; }
+        .history-year-title { font-weight: bold; color: #c0392b; border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 10px; }
+        .history-task-item { margin-left: 10px; margin-bottom: 10px; border-left: 3px solid #2980b9; padding-left: 10px; }
+        .history-task-content { font-weight: bold; font-size: 13px; color: #2c3e50; }
+        .history-detail-table { width: 100%; font-size: 11px; margin-top: 5px; border-collapse: collapse; }
+        .history-detail-table th, .history-detail-table td { border: 1px solid #ddd; padding: 3px 5px; }
+        .history-detail-table th { background: #ecf0f1; }
 
         tr.category-row td { font-weight: bold; background-color: #fff2cc; vertical-align: middle; }
         #fileInputExcel, #driveUploadInput { display: none; }
@@ -77,7 +87,6 @@
             justify-content: center; align-items: center; flex-direction: column; color: white;
         }
         
-        /* Styles cho danh sách trong Modal */
         .manage-item-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
         .manage-item-row:last-child { border-bottom: none; margin-bottom: 0; }
         .manage-item-input { flex-grow: 1; }
@@ -152,13 +161,24 @@
             </div>
             <div class="modal-body">
                 <p class="small text-muted mb-3 fst-italic">Bạn có thể sửa tên hiển thị hoặc xoá các link không cần thiết.</p>
-                <div id="manageListContainer">
-                    </div>
+                <div id="manageListContainer"></div>
             </div>
             <div class="modal-footer py-1">
                 <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
                 <button type="button" class="btn btn-primary btn-sm" onclick="saveManageChanges()">Lưu Thay Đổi</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="historyModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white py-2">
+                <h5 class="modal-title fs-6 fw-bold" id="historyModalTitle">Chi tiết Lịch sử Bảo dưỡng Sửa chữa</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="historyModalBody"></div>
         </div>
     </div>
 </div>
@@ -183,29 +203,25 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // 2. GOOGLE DRIVE CONFIG
+    // 2. CONFIG KHÁC
     const CLIENT_ID = "588583798336-o4gjnfqaupmmdp8mi38o9m8r4n0bbghs.apps.googleusercontent.com";
     const FOLDER_ID = "1uyHJHfNFLIdPQbYu1uF4zliORCM6QK3P";
     const SCOPES = 'https://www.googleapis.com/auth/drive.file';
+    
+    // Cấu hình các năm cần quét dữ liệu
+    const TARGET_YEARS = [2023, 2024, 2025]; 
 
     let tokenClient;
     let accessToken = null;
     let localDataCache = null;
     let localViewMode = false;
     let currentUploadTarget = null; 
-    
-    // Biến tạm để lưu thông tin khi mở Modal quản lý
     let currentManageTarget = null; 
 
     const fieldHeaderMap = {
-        'ThongSoKT': 'Thông số KT',
-        'Catalogue': 'Catalogue',
-        'KiemDinh': 'Kiểm định',
-        'QuyTrinhVH': 'Quy trình VH',
-        'QuyTrinhBD': 'Quy trình BD',
-        'DinhMuc': 'Định mức',
-        'DGRR': 'Đánh giá rủi ro',
-        'BieuMau': 'Biểu mẫu'
+        'ThongSoKT': 'Thông số KT', 'Catalogue': 'Catalogue', 'KiemDinh': 'Kiểm định',
+        'QuyTrinhVH': 'Quy trình VH', 'QuyTrinhBD': 'Quy trình BD', 'DinhMuc': 'Định mức',
+        'DGRR': 'Đánh giá rủi ro', 'BieuMau': 'Biểu mẫu'
     };
 
     const tableBody = document.getElementById('tableBody');
@@ -217,9 +233,9 @@
     const authBtn = document.getElementById('authBtn');
     const authStatus = document.getElementById('authStatus');
     
-    // Modal Element
-    const manageModalEl = document.getElementById('manageModal');
-    const manageModal = new bootstrap.Modal(manageModalEl);
+    // Modals
+    const manageModal = new bootstrap.Modal(document.getElementById('manageModal'));
+    const historyModal = new bootstrap.Modal(document.getElementById('historyModal'));
 
     window.onload = function() {
         loadAllData();
@@ -227,17 +243,12 @@
             client_id: CLIENT_ID, scope: SCOPES,
             callback: (tokenResponse) => {
                 accessToken = tokenResponse.access_token;
-                if (accessToken) {
-                    authBtn.style.display = 'none';
-                    authStatus.style.display = 'inline-block';
-                }
+                if (accessToken) { authBtn.style.display = 'none'; authStatus.style.display = 'inline-block'; }
             },
         });
     };
 
-    window.handleAuthClick = function() {
-        if (!accessToken) tokenClient.requestAccessToken({prompt: 'consent'});
-    };
+    window.handleAuthClick = function() { if (!accessToken) tokenClient.requestAccessToken({prompt: 'consent'}); };
 
     function loadAllData() {
         showLoading("Đang tải dữ liệu...");
@@ -249,12 +260,8 @@
             localDataCache = results[1].val();
             facilityNameSpan.textContent = name ? name : "..........................";
             renderTable(localDataCache);
-        }).catch((error) => {
-            console.error(error);
-            alert("Lỗi tải dữ liệu Firebase.");
-        }).finally(() => {
-            hideLoading();
-        });
+        }).catch((error) => { console.error(error); alert("Lỗi tải dữ liệu Firebase."); })
+          .finally(() => { hideLoading(); });
     }
 
     editModeToggle.addEventListener('change', (e) => {
@@ -262,13 +269,10 @@
         renderTable(localDataCache);
     });
 
-    // --- RENDER FUNCTION ---
+    // --- RENDER TABLE ---
     function renderTable(data) {
         tableBody.innerHTML = "";
-        if (!data) {
-            tableBody.innerHTML = "<tr><td colspan='12' class='text-center'>Chưa có dữ liệu</td></tr>";
-            return;
-        }
+        if (!data) { tableBody.innerHTML = "<tr><td colspan='12' class='text-center'>Chưa có dữ liệu</td></tr>"; return; }
 
         const categories = Object.keys(data).sort((a, b) => romanToInt(a) - romanToInt(b));
 
@@ -286,43 +290,54 @@
                 const rowItem = document.createElement('tr');
 
                 const createCell = (value, fieldName, isUploadable = false) => {
-                    // 1. Logic cho Cột Lịch Sử BDSC (Revert về ô text thường)
-                    if (fieldName === 'LichSuBDSC' || fieldName === 'TenThietBi' || fieldName === 'Tagname') {
+                    // A. Cột Lịch Sử BDSC
+                    if (fieldName === 'LichSuBDSC') {
+                        let content = "";
+                        // Kiểm tra nếu là Object (Dữ liệu đã thu thập)
+                        if (typeof value === 'object' && value !== null) {
+                            content = `<button class="btn-mini btn-link" onclick="viewHistoryDetail('${catKey}', '${itemKey}')">
+                                        <i class="fas fa-eye"></i> Xem Chi Tiết
+                                      </button>`;
+                        } else {
+                            // Dữ liệu text cũ
+                            if (value && value.toString().startsWith('http')) content = `<a href="${value}" target="_blank">Xem Link</a>`;
+                            else content = value || "";
+                        }
+
+                        if (localViewMode) {
+                            const toolbar = `
+                                <div class="cell-actions">
+                                    <button class="btn-mini btn-collect" title="Tự động tìm kiếm & thu thập" 
+                                        onclick="collectBDSC('${catKey}', '${itemKey}', '${item.Tagname}')">
+                                        <i class="fas fa-magic"></i> Thu thập
+                                    </button>
+                                </div>`;
+                            return toolbar + content;
+                        }
+                        return content;
+                    }
+
+                    // B. Cột Tên & Tagname (Sửa trực tiếp)
+                    if (fieldName === 'TenThietBi' || fieldName === 'Tagname') {
                         if (localViewMode) {
                             return `<input type="text" class="inline-edit" value="${value || ''}" 
                                     onchange="updateInline('${catKey}', '${itemKey}', '${fieldName}', this.value)">`;
-                        } else {
-                            // Nếu là Lịch sử BDSC, vẫn giữ tính năng detect link đơn giản nếu có http
-                            if (fieldName === 'LichSuBDSC' && value && value.toString().startsWith('http')) {
-                                return `<a href="${value}" target="_blank">Xem Link</a>`;
-                            }
-                            return value || "";
                         }
+                        return value || "";
                     }
 
-                    // 2. Logic cho các cột Tài Liệu (Đa trị)
+                    // C. Các cột Tài liệu (Upload/Link)
                     let htmlContent = renderMultiLinkList(value);
-
                     if (localViewMode && isUploadable) {
                          const toolbar = `
                             <div class="cell-actions">
-                                <button class="btn-mini btn-upload" title="Upload" 
-                                    onclick="triggerUpload('${catKey}', '${itemKey}', '${fieldName}')">
-                                    <i class="fas fa-cloud-upload-alt"></i> Up
-                                </button>
-                                <button class="btn-mini btn-link" title="Thêm Link" 
-                                    onclick="triggerManualLink('${catKey}', '${itemKey}', '${fieldName}')">
-                                    <i class="fas fa-plus"></i> Link
-                                </button>
-                                <button class="btn-mini btn-manage" title="Sửa/Xoá Link" 
-                                    onclick="openManageModal('${catKey}', '${itemKey}', '${fieldName}')">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+                                <button class="btn-mini btn-upload" title="Upload" onclick="triggerUpload('${catKey}', '${itemKey}', '${fieldName}')"><i class="fas fa-cloud-upload-alt"></i></button>
+                                <button class="btn-mini btn-link" title="Thêm Link" onclick="triggerManualLink('${catKey}', '${itemKey}', '${fieldName}')"><i class="fas fa-plus"></i></button>
+                                <button class="btn-mini btn-manage" title="Sửa/Xoá" onclick="openManageModal('${catKey}', '${itemKey}', '${fieldName}')"><i class="fas fa-edit"></i></button>
                             </div>
                         `;
                         return toolbar + htmlContent;
                     } 
-                    
                     return htmlContent;
                 };
 
@@ -345,41 +360,197 @@
         });
     }
 
+    // --- LOGIC THU THẬP BDSC ---
+    window.collectBDSC = async function(catKey, itemKey, tagName) {
+        if (!tagName) { alert("Thiết bị này chưa có Tagname để tìm kiếm!"); return; }
+        
+        showLoading(`Đang quét dữ liệu cho Tag: ${tagName}...`);
+        let collectedData = {};
+        let foundAny = false;
+
+        try {
+            // Duyệt qua các năm
+            for (let year of TARGET_YEARS) {
+                const snapshot = await get(ref(db, `congViecMe${year}`));
+                if (!snapshot.exists()) continue;
+
+                const yearData = snapshot.val();
+                
+                // Duyệt Node A, B, C...
+                for (const [groupId, groupData] of Object.entries(yearData)) {
+                    if (!groupData.children) continue;
+
+                    // Duyệt Node I, II... (children)
+                    for (const [childId, childData] of Object.entries(groupData.children)) {
+                        if (!childData.grandchildren) continue;
+
+                        // Duyệt Node 1, 2... (grandchildren)
+                        for (const [grandId, grandData] of Object.entries(childData.grandchildren)) {
+                            // Kiểm tra Tagname & Trạng thái
+                            if (grandData.tagName === tagName) {
+                                if (grandData.daThucHien === true && grandData.greatGrandchildren) {
+                                    
+                                    if (!collectedData[year]) collectedData[year] = {};
+
+                                    // Duyệt node con (greatGrandchildren - x,y)
+                                    for (const [ggId, ggData] of Object.entries(grandData.greatGrandchildren)) {
+                                        if (ggData.executions) {
+                                            const execData = ggData.executions;
+                                            const entryId = `${grandId}_${ggId}`; 
+                                            
+                                            // Lấy chi tiết
+                                            let details = {};
+                                            for(const [key, val] of Object.entries(execData)) {
+                                                if (!isNaN(key) && typeof val === 'object') {
+                                                    details[key] = {
+                                                        donGia: val.donGia || "",
+                                                        dvt: val.dvt || "",
+                                                        lanThucHien: val.lanThucHien || "",
+                                                        ngayThucHien: val.ngayThucHien || "",
+                                                        thanhTien: val.thanhTien || "",
+                                                        hoSoLink: val.hoSoLink || "" // <--- Lấy thêm hoSoLink
+                                                    };
+                                                }
+                                            }
+
+                                            collectedData[year][entryId] = {
+                                                noiDung: ggData.noiDung || "Không có nội dung",
+                                                details: details
+                                            };
+                                            foundAny = true;
+                                        }
+                                    }
+                                }
+                                break; 
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (foundAny) {
+                await update(ref(db, `Quanlythietbi/${catKey}/${itemKey}`), { LichSuBDSC: collectedData });
+                if(localDataCache[catKey][itemKey]) localDataCache[catKey][itemKey]['LichSuBDSC'] = collectedData;
+                renderTable(localDataCache);
+                alert("Đã thu thập dữ liệu thành công!");
+            } else {
+                alert(`Không tìm thấy dữ liệu bảo dưỡng nào đã thực hiện cho Tag: ${tagName}`);
+            }
+
+        } catch (error) {
+            console.error(error);
+            alert("Lỗi khi thu thập: " + error.message);
+        } finally {
+            hideLoading();
+        }
+    };
+
+    // --- HIỂN THỊ CHI TIẾT LỊCH SỬ ---
+    window.viewHistoryDetail = function(catKey, itemKey) {
+        const data = localDataCache[catKey][itemKey]['LichSuBDSC'];
+        const deviceName = localDataCache[catKey][itemKey]['TenThietBi'] || "Thiết bị chưa đặt tên";
+        
+        // Cập nhật tiêu đề Modal
+        document.getElementById('historyModalTitle').innerText = `Lịch sử BDSC: ${deviceName}`;
+        
+        const container = document.getElementById('historyModalBody');
+        container.innerHTML = "";
+
+        if (!data || typeof data !== 'object') {
+            container.innerHTML = "<p class='text-center'>Dữ liệu không đúng định dạng.</p>";
+            return;
+        }
+
+        // Duyệt từng năm
+        Object.keys(data).sort().reverse().forEach(year => {
+            const yearBlock = document.createElement('div');
+            yearBlock.className = 'history-year-block';
+            
+            let html = `<div class="history-year-title"><i class="far fa-calendar-alt"></i> Năm ${year}</div>`;
+            
+            const tasks = data[year];
+            Object.keys(tasks).forEach(taskId => {
+                const task = tasks[taskId];
+                html += `
+                    <div class="history-task-item">
+                        <div class="history-task-content">${task.noiDung}</div>
+                `;
+                
+                if (task.details && Object.keys(task.details).length > 0) {
+                    html += `
+                        <table class="history-detail-table">
+                            <thead>
+                                <tr>
+                                    <th>Lần</th>
+                                    <th>Ngày TH</th>
+                                    <th>ĐVT</th>
+                                    <th>Đơn giá</th>
+                                    <th>Thành tiền</th>
+                                    <th>Hồ sơ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    Object.keys(task.details).forEach(dKey => {
+                        const d = task.details[dKey];
+                        // Xử lý hiển thị link hồ sơ gọn gàng
+                        const linkDisplay = d.hoSoLink ? 
+                            `<a href="${d.hoSoLink}" target="_blank" class="text-decoration-none fw-bold" title="Mở hồ sơ">
+                                <i class="fas fa-file-contract"></i> Xem
+                             </a>` : "-";
+
+                        html += `
+                            <tr>
+                                <td class="text-center">${d.lanThucHien}</td>
+                                <td class="text-center">${d.ngayThucHien}</td>
+                                <td class="text-center">${d.dvt}</td>
+                                <td class="text-end">${formatCurrency(d.donGia)}</td>
+                                <td class="text-end fw-bold">${formatCurrency(d.thanhTien)}</td>
+                                <td class="text-center">${linkDisplay}</td>
+                            </tr>
+                        `;
+                    });
+                    html += `</tbody></table>`;
+                } else {
+                    html += `<div class="small text-muted ms-2">- Không có chi tiết thực hiện -</div>`;
+                }
+                html += `</div>`; 
+            });
+
+            yearBlock.innerHTML = html;
+            container.appendChild(yearBlock);
+        });
+
+        historyModal.show();
+    };
+
+    function formatCurrency(num) {
+        if(!num) return "-";
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
     // --- MODAL QUẢN LÝ LINK ---
     window.openManageModal = function(catKey, itemKey, fieldName) {
         currentManageTarget = { catKey, itemKey, fieldName };
         const container = document.getElementById('manageListContainer');
         container.innerHTML = "";
-
-        // Lấy dữ liệu hiện tại
         let data = localDataCache[catKey][itemKey][fieldName];
         let items = [];
-
-        // Chuẩn hóa dữ liệu về mảng
         if (data) {
             if (typeof data === 'string') items = [{ name: "Link cũ", url: data }];
             else if (Array.isArray(data)) items = [...data];
             else if (typeof data === 'object') items = Object.values(data);
         }
-
-        if (items.length === 0) {
-            container.innerHTML = "<div class='text-center text-muted'>Chưa có link nào.</div>";
-        } else {
+        if (items.length === 0) { container.innerHTML = "<div class='text-center text-muted'>Chưa có link nào.</div>"; } 
+        else {
             items.forEach((item, index) => {
                 const displayName = item.name || "File đính kèm";
                 const row = document.createElement('div');
                 row.className = "manage-item-row";
                 row.innerHTML = `
-                    <input type="text" class="form-control form-control-sm manage-item-input" 
-                        value="${displayName}" placeholder="Tên hiển thị" id="linkName-${index}">
-                    
-                    <a href="${item.url}" target="_blank" title="Kiểm tra link" class="manage-item-link">
-                        <i class="fas fa-external-link-alt"></i>
-                    </a>
-                    
-                    <i class="fas fa-trash-alt manage-item-del" title="Xoá link này" 
-                        onclick="markDeleted(this)"></i>
-                    
+                    <input type="text" class="form-control form-control-sm manage-item-input" value="${displayName}" id="linkName-${index}">
+                    <a href="${item.url}" target="_blank" class="manage-item-link"><i class="fas fa-external-link-alt"></i></a>
+                    <i class="fas fa-trash-alt manage-item-del" onclick="markDeleted(this)"></i>
                     <input type="hidden" id="linkUrl-${index}" value="${item.url}">
                     <input type="hidden" id="linkCreated-${index}" value="${item.created || Date.now()}">
                 `;
@@ -389,103 +560,63 @@
         manageModal.show();
     };
 
-    // Hàm đánh dấu xoá (chỉ ẩn giao diện, xoá thật khi bấm Lưu)
-    window.markDeleted = function(el) {
-        const row = el.closest('.manage-item-row');
-        if(row) {
-            row.classList.add('d-none'); // Ẩn đi
-            row.classList.add('marked-delete'); // Đánh dấu xoá
-        }
-    };
+    window.markDeleted = function(el) { el.closest('.manage-item-row').classList.add('d-none', 'marked-delete'); };
 
     window.saveManageChanges = async function() {
         if (!currentManageTarget) return;
         const { catKey, itemKey, fieldName } = currentManageTarget;
-        
-        // Thu thập dữ liệu từ Modal
-        const container = document.getElementById('manageListContainer');
-        const rows = container.querySelectorAll('.manage-item-row');
+        const rows = document.querySelectorAll('#manageListContainer .manage-item-row');
         const newData = [];
-
         rows.forEach((row, index) => {
-            // Bỏ qua các dòng đã đánh dấu xoá
             if (row.classList.contains('marked-delete')) return;
-
             const name = row.querySelector(`#linkName-${index}`).value;
             const url = row.querySelector(`#linkUrl-${index}`).value;
             const created = row.querySelector(`#linkCreated-${index}`).value;
-
-            if (url) {
-                newData.push({
-                    name: name || "File không tên",
-                    url: url,
-                    created: parseInt(created)
-                });
-            }
+            if (url) newData.push({ name: name || "File không tên", url: url, created: parseInt(created) });
         });
-
-        // Lưu lên Firebase
         showLoading("Đang lưu thay đổi...");
         try {
             await set(ref(db, `Quanlythietbi/${catKey}/${itemKey}/${fieldName}`), newData);
-            
-            // Cập nhật Local Cache
             if (!localDataCache[catKey][itemKey]) localDataCache[catKey][itemKey] = {};
             localDataCache[catKey][itemKey][fieldName] = newData;
-            
             renderTable(localDataCache);
             manageModal.hide();
-        } catch(err) {
-            alert("Lỗi khi lưu: " + err.message);
-        } finally {
-            hideLoading();
-        }
+        } catch(err) { alert("Lỗi khi lưu: " + err.message); } finally { hideLoading(); }
     };
 
-
-    // --- CÁC HÀM HỖ TRỢ KHÁC (GIỮ NGUYÊN) ---
+    // --- SUPPORT FUNCTIONS ---
     function renderMultiLinkList(data) {
-        if (!data) return "";
+        if (!data || typeof data !== 'object') return ""; 
+        if (!Array.isArray(data) && !data.url) return ""; 
+        
         let items = [];
         if (typeof data === 'string') items = [{ name: "Link cũ", url: data }];
         else if (Array.isArray(data)) items = [...data].reverse();
-        else if (typeof data === 'object') items = Object.values(data).reverse();
+        else if (typeof data === 'object' && !data.noiDung) items = Object.values(data).reverse(); 
 
         if (items.length === 0) return "";
-
         let html = '<div class="multi-link-box">';
         items.forEach(link => {
+            if(!link.url) return;
             const displayName = link.name || "File đính kèm";
-            html += `
-                <div class="link-item">
-                    <i class="fas fa-caret-right text-muted" style="font-size:10px;"></i>
-                    <a href="${link.url}" target="_blank" title="${displayName}">${displayName}</a>
-                </div>
-            `;
+            html += `<div class="link-item"><i class="fas fa-caret-right text-muted" style="font-size:10px;"></i> <a href="${link.url}" target="_blank" title="${displayName}">${displayName}</a></div>`;
         });
         html += '</div>';
         return html;
     }
 
-    // Logic Upload và thêm Link thủ công (như cũ)
     async function appendDataToField(catKey, itemKey, fieldName, newObj) {
         const path = `Quanlythietbi/${catKey}/${itemKey}/${fieldName}`;
         const snapshot = await get(ref(db, path));
         let currentData = snapshot.val();
         let newData = [];
-
         if (currentData) {
             if (typeof currentData === 'string') newData.push({ name: "Tài liệu cũ", url: currentData, created: Date.now() });
             else if (Array.isArray(currentData)) newData = currentData;
-            else if (typeof data === 'object') newData = Object.values(currentData);
         }
         newData.push(newObj);
         await set(ref(db, path), newData);
-        
         if (!localDataCache[catKey][itemKey][fieldName]) localDataCache[catKey][itemKey][fieldName] = [];
-        if (typeof localDataCache[catKey][itemKey][fieldName] === 'string') {
-             localDataCache[catKey][itemKey][fieldName] = [{name:"Tài liệu cũ", url:localDataCache[catKey][itemKey][fieldName]}];
-        }
         localDataCache[catKey][itemKey][fieldName].push(newObj);
         renderTable(localDataCache);
     }
@@ -503,7 +634,6 @@
         const suggestName = fieldHeaderMap[fieldName] || fieldName;
         const userFileName = prompt(`Nhập tên hiển thị:\n(Ví dụ: ${suggestName} T10)`, suggestName);
         if (userFileName === null) { driveUploadInput.value = ""; return; }
-
         showLoading(`Đang tải lên: ${file.name}...`);
         try {
             const metadata = { 'name': file.name, 'mimeType': file.type || 'application/octet-stream', 'parents': [FOLDER_ID] };
@@ -537,7 +667,8 @@
             .then(() => { if(localDataCache[catKey][itemKey]) localDataCache[catKey][itemKey][fieldName] = newValue; })
             .catch((err) => alert("Lỗi cập nhật: " + err.message));
     };
-
+    
+    // EXCEL IMPORT - GIỮ NGUYÊN LOGIC CŨ
     const fileInputExcel = document.getElementById('fileInputExcel');
     fileInputExcel.addEventListener('change', (e) => {
         const file = e.target.files[0];
