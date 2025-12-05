@@ -126,6 +126,28 @@
         .login-logo { width: 120px; display: block; margin: 0 auto 20px auto; }
         
         /* History Modal Table */
+		.history-year-block { 
+    margin-bottom: 20px; 
+    border: 1px solid #e0e0e0; 
+    padding: 15px; 
+    border-radius: 8px; 
+    background: #ffffff;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* FIX: Tiêu đề Năm Đậm & Đỏ */
+.history-year-title { 
+    font-weight: 700 !important;  /* Bắt buộc in đậm */
+    color: #dc3545 !important;    /* Màu đỏ đậm */
+    font-size: 14px;
+    text-transform: uppercase;    /* Viết hoa cho nổi bật */
+    border-bottom: 2px solid #dc3545; /* Gạch chân màu đỏ */
+    padding-bottom: 8px; 
+    margin-bottom: 15px; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
         .history-detail-table { width: 100%; font-size: 12px; border-collapse: collapse; background: white; table-layout: fixed; }
         .history-detail-table th, .history-detail-table td { border: 1px solid #ddd; padding: 6px 8px; vertical-align: middle; }
         .history-detail-table th { background: #f8f9fa; font-weight: 700; text-align: center; }
@@ -651,7 +673,7 @@
                     html += `<table class="history-detail-table">
                                 <thead><tr>
                                     <th class="col-hist-date">Ngày</th>
-                                    <th class="col-hist-unit">ĐVT</th>
+                                    <th class="col-hist-unit">SL</th>
                                     <th class="col-hist-price">Đơn giá</th>
                                     <th class="col-hist-total">Thành tiền</th>
                                     <th class="col-hist-link">HS</th>
@@ -777,11 +799,11 @@
         return hasData ? result : null;
     }
 
-    window.triggerUpload = function(c,i,f) { if(!accessToken) { alert("Login Drive!"); return; } currentUploadTarget={c,i,f}; elements.driveInput.click(); };
+    window.triggerUpload = function(c,i,f) { if(!accessToken) { alert("Vui lòng nhấn nút 'Đăng nhập Drive' trước!"); return; } currentUploadTarget={c,i,f}; elements.driveInput.click(); };
     elements.driveInput.addEventListener('change', async(e)=>{
         const f=e.target.files[0]; if(!f) return;
         const {c,i,f:fd} = currentUploadTarget;
-        const name = prompt("Tên:", f.name); if(!name) return;
+        const name = prompt("Nhập tên hiển thị cho file này:", f.name); if(!name) return;
         window.showLoading("Uploading...");
         const meta = { 'name': f.name, 'mimeType': f.type, 'parents': [FOLDER_ID] };
         const form = new FormData(); form.append('metadata', new Blob([JSON.stringify(meta)], {type:'application/json'})); form.append('file', f);
@@ -797,7 +819,7 @@
     });
 
     window.triggerManualLink = async function(c,i,f) {
-        const u = prompt("Link:"); if(!u) return; const n = prompt("Tên:"); if(!n) return;
+        const u = prompt("Dán đường link tài liệu của bạn vào đây:"); if(!u) return; const n = prompt("Nhập tên hiển thị cho link này:"); if(!n) return;
         let arr = localDataCache[c][i][f] || []; if(!Array.isArray(arr)) arr = arr.url ? [arr] : [];
         arr.push({name:n, url:u, created: Date.now()});
         await set(ref(db, `Quanlythietbi/${c}/${i}/${f}`), arr); localDataCache[c][i][f] = arr; renderTable(localDataCache);
@@ -805,7 +827,7 @@
 
     window.exportCurrentHistory = function() {
         if(!currentHistoryData) return;
-        const rows = [["Năm", "Nội dung", "Ngày", "ĐVT", "Đơn giá", "Thành tiền", "Link"]];
+        const rows = [["Năm", "Nội dung", "Ngày", "SL", "Đơn giá", "Thành tiền", "Link"]];
         const flat = [];
         Object.keys(currentHistoryData).forEach(y => {
             Object.values(currentHistoryData[y]).forEach(t => {
