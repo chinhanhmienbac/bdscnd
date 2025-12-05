@@ -355,7 +355,14 @@
     const CLIENT_ID = "588583798336-o4gjnfqaupmmdp8mi38o9m8r4n0bbghs.apps.googleusercontent.com";
     const FOLDER_ID = "1uyHJHfNFLIdPQbYu1uF4zliORCM6QK3P";
     const SCOPES = 'https://www.googleapis.com/auth/drive.file';
-    const TARGET_YEARS = [2023, 2024, 2025];
+    const START_YEAR = 2023; // Hãy sửa số này thành năm cũ nhất bạn có dữ liệu
+const currentYear = new Date().getFullYear(); // Lấy năm hiện tại (ví dụ: 2025)
+const TARGET_YEARS = [];
+
+// Vòng lặp tạo danh sách từ năm bắt đầu đến năm sau (để dự phòng cho tương lai gần)
+for (let y = START_YEAR; y <= currentYear + 1; y++) {
+    TARGET_YEARS.push(y);
+}
 
     // Helpers (Declared Top)
     window.showLoading = function(msg) { document.getElementById('loadingText').innerText = msg; document.getElementById('loadingMsg').style.display = "flex"; };
