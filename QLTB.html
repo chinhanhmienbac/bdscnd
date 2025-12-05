@@ -16,10 +16,23 @@
         body { background-color: #f4f6f9; font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; padding: 20px; }
         .excel-sheet { background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 20px 30px; min-height: 100vh; position: relative; border-radius: 8px; }
         
-        /* 8. Logo & 9. Fonts/Colors */
-        .site-logo { position: absolute; top: 15px; left: 15px; width: 8%; z-index: 10; }
-        h1.main-title { text-align: center; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; font-size: 26px; color: #217346; font-family: 'Segoe UI', sans-serif; margin-top: 10px; }
-        h2.sub-title { text-align: center; font-weight: 600; font-size: 18px; margin-bottom: 25px; color: #27ae60; font-family: 'Segoe UI', sans-serif; }
+        /* Logo & Fonts */
+        .site-logo { 
+            position: absolute; top: 15px; left: 15px; width: 8%; z-index: 10; 
+            transform: translate(15%, 10%); 
+        }
+
+        h1.main-title { 
+            text-align: center; font-weight: 700; text-transform: uppercase; 
+            margin-bottom: 5px; font-size: 34px; 
+            color: #217346; font-family: 'Segoe UI', sans-serif; margin-top: 10px; 
+        }
+        h2.sub-title { 
+            text-align: center; font-weight: 600; 
+            font-size: 24px; 
+            margin-bottom: 25px; color: #27ae60; font-family: 'Segoe UI', sans-serif; 
+        }
+        
         #facilityName { border-bottom: 2px dotted #27ae60; min-width: 150px; display: inline-block; color: #333; }
 
         /* Action Bar */
@@ -27,81 +40,101 @@
         .form-check-input { cursor: pointer; width: 3em; height: 1.5em; }
         .edit-mode-label { font-weight: bold; color: #d63384; margin-right: 10px; user-select: none; font-size: 14px; }
 
-        /* 7. Sticky Header */
+        /* Table CSS */
         .table-container { max-height: 80vh; overflow-y: auto; border: 1px solid #000; }
         table.excel-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+        
         table.excel-table th { 
             position: sticky; top: 0; z-index: 5;
             background-color: #d9e1f2; border: 1px solid #a0a0a0;
             padding: 8px 4px; font-weight: bold; text-align: center; vertical-align: middle;
             box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4); 
         }
-        table.excel-table td { border: 1px solid #a0a0a0; padding: 6px 6px; vertical-align: top; background: #fff; }
+        table.excel-table td { border: 1px solid #a0a0a0; padding: 6px 6px; vertical-align: top; }
 
-        /* 10. 3D Row Effect */
-        table.excel-table tbody tr {
-            transition: transform 0.1s;
+        /* --- GRADIENT 3D ROW EFFECT --- */
+        /* Dòng lẻ: Trắng thuần */
+        table.excel-table tbody tr:nth-of-type(odd) td { 
+            background-color: #ffffff;
         }
-        table.excel-table tbody tr td {
-            border-bottom: 2px solid #dcdcdc; /* Tạo cảm giác dày */
+        
+        /* Dòng chẵn: Gradient 3D (Sáng -> Tối -> Sáng) */
+        table.excel-table tbody tr:nth-of-type(even) td { 
+            background: linear-gradient(180deg, 
+                #fdfdfd 0%,   /* Sáng ở mép trên */
+                #eaeff2 50%,  /* Đậm hơn ở giữa (tạo khối) */
+                #fdfdfd 100%  /* Sáng ở mép dưới */
+            );
         }
-        table.excel-table tbody tr:hover td {
-            background-color: #f1f8ff;
+
+        /* Hover: Gradient Xanh dương 3D */
+        table.excel-table tbody tr:hover td { 
+            background: linear-gradient(180deg, 
+                #f0f8ff 0%, 
+                #dbe9f6 50%, 
+                #f0f8ff 100%
+            ) !important;
+            transition: background 0.15s ease;
         }
+
+        /* Category Row */
+        tr.category-row td { font-weight: 700; background-color: #fff2cc !important; vertical-align: middle; border-bottom: 1px solid #999; }
 
         /* Columns */
         .col-stt { width: 50px; text-align: center; font-weight: bold; }
         .col-name { width: 15%; }
         .col-data { width: auto; }
 
-        /* 11. Faded Buttons */
-        .cell-actions { display: flex; gap: 3px; margin-bottom: 6px; justify-content: center; border-bottom: 1px solid #eee; padding-bottom: 4px; opacity: 0.2; transition: opacity 0.3s; }
-        td:hover .cell-actions { opacity: 1; } /* Hiện rõ khi hover vào ô */
+        /* Buttons & Inline Edit */
+        .cell-actions { display: flex; gap: 3px; margin-bottom: 6px; justify-content: center; border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 4px; opacity: 0.2; transition: opacity 0.3s; }
+        td:hover .cell-actions { opacity: 1; }
         
         .btn-mini { border: none; font-size: 10px; padding: 3px 6px; border-radius: 3px; cursor: pointer; color: white; font-weight: bold; transition: 0.2s; }
-        .btn-upload { background-color: #f39c12; }
-        .btn-link { background-color: #3498db; }
-        .btn-manage { background-color: #9b59b6; }
-        .btn-collect { background-color: #27ae60; }
         .btn-mini:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .btn-upload { background-color: #f39c12; } .btn-link { background-color: #3498db; }
+        .btn-manage { background-color: #9b59b6; } .btn-collect { background-color: #27ae60; }
+        
+        .inline-edit { width: 100%; border: 1px solid #3498db; padding: 4px; background-color: rgba(255,255,255,0.8); font-weight: 600; font-size: 13px; border-radius: 3px; }
 
-        /* Inline Edit */
-        .inline-edit { width: 100%; border: 1px solid #3498db; padding: 4px; background-color: #eaf2f8; font-weight: 600; font-size: 13px; border-radius: 3px; }
-
-        /* Multi-link Box */
-        .multi-link-box { max-height: 80px; overflow-y: auto; display: block; background-color: #fff; border: 1px solid #f0f0f0; padding: 2px; border-radius: 3px; }
+        /* Multi-link Box (Transparent to show gradient) */
+        .multi-link-box { 
+            max-height: 80px; overflow-y: auto; display: block; 
+            background-color: transparent; 
+            border: 1px solid rgba(0,0,0,0.05); 
+            padding: 2px; border-radius: 3px; 
+        }
         .multi-link-box::-webkit-scrollbar { width: 4px; }
         .multi-link-box::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
-        .link-item { display: block; font-size: 12px; line-height: 1.6; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border-bottom: 1px dashed #eee; padding: 1px 0; }
+
+        /* Link Item (Reverted to standard QLTB3 style) */
+        .link-item { 
+            display: block; font-size: 12px; line-height: 1.6; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+            border-bottom: 1px dashed rgba(0,0,0,0.1); padding: 1px 0; 
+        }
         .link-item a { text-decoration: none; color: #0066cc; }
         .link-item a:hover { color: #d35400; text-decoration: underline; }
 
-        /* Buttons Main */
+        /* Main Buttons */
         .btn-excel-export { background-color: #1D6F42; color: white; }
         .btn-excel-import { background-color: #e67e22; color: white; }
         .btn-batch { background-color: #8e44ad; color: white; }
         .btn-main { display: flex; align-items: center; gap: 6px; font-weight: 500; font-size: 13px; padding: 6px 12px; }
 
-        tr.category-row td { font-weight: 700; background-color: #fff2cc !important; vertical-align: middle; border-bottom: 1px solid #999; }
-        #fileInputExcel, #driveUploadInput { display: none; }
-
-        /* Loading & Modals */
+        /* Modals & Loading */
         #loadingMsg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; display: none; justify-content: center; align-items: center; flex-direction: column; color: white; }
-        
-        /* 2. Login Modal Style */
         .login-logo { width: 120px; display: block; margin: 0 auto 20px auto; }
-        .modal-login .modal-content { border-radius: 10px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .modal-login .modal-header { border-bottom: none; padding-bottom: 0; }
-        .modal-login .modal-body { padding: 30px; }
-
-        /* History Styles */
-        .history-year-block { margin-bottom: 15px; border: 1px solid #e0e0e0; padding: 10px; border-radius: 6px; background: #fafafa; }
-        .history-year-title { font-weight: 700; color: #c0392b; border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 10px; }
-        .history-detail-table { width: 100%; font-size: 12px; border-collapse: collapse; background: white; }
-        .history-detail-table th, .history-detail-table td { border: 1px solid #ddd; padding: 4px 8px; }
-        .history-detail-table th { background: #f8f9fa; font-weight: 600; }
-
-        /* Manage Links */
+        
+        /* History Modal Table */
+        .history-detail-table { width: 100%; font-size: 12px; border-collapse: collapse; background: white; table-layout: fixed; }
+        .history-detail-table th, .history-detail-table td { border: 1px solid #ddd; padding: 6px 8px; vertical-align: middle; }
+        .history-detail-table th { background: #f8f9fa; font-weight: 700; text-align: center; }
+        .col-hist-date { width: 15%; text-align: center; } .col-hist-unit { width: 10%; text-align: center; }
+        .col-hist-price { width: 25%; text-align: right; } .col-hist-total { width: 25%; text-align: right; font-weight: bold; color: #c0392b; }
+        .col-hist-link { width: 10%; text-align: center; }
+        
+        .device-table { width: 100%; font-size: 12px; border-collapse: collapse; background: white; }
+        .device-table th, .device-table td { border: 1px solid #ddd; padding: 4px 8px; }
         .manage-item-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
         .manage-item-del { color: #e74c3c; cursor: pointer; }
     </style>
@@ -239,13 +272,47 @@
     </div>
 </div>
 
+<div class="modal fade" id="deviceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning py-2">
+                <h5 class="modal-title fs-6 fw-bold text-dark">Quản lý Thiết bị trong Phân loại</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="deviceModalContent">
+                    <table class="device-table" id="deviceTableList">
+                        <thead>
+                            <tr>
+                                <th style="width:50px">STT</th>
+                                <th>Tên Thiết bị</th>
+                                <th style="width:50px">Xoá</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deviceTableBody"></tbody>
+                    </table>
+                </div>
+                <div class="mt-3">
+                    <label class="form-label fw-bold small">Thêm thiết bị mới:</label>
+                    <div class="input-group input-group-sm">
+                        <input type="text" id="newDeviceName" class="form-control" placeholder="Nhập tên thiết bị...">
+                        <button class="btn btn-success" onclick="addNewDevice()">
+                            <i class="fas fa-plus"></i> Thêm
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <input type="file" id="fileInputExcel" accept=".xlsx, .xls">
 <input type="file" id="driveUploadInput">
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, set, get, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getDatabase, ref, set, get, update, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getAuth, signInWithEmailAndPassword, setPersistence, browserSessionPersistence, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
     // --- CONFIG ---
     const firebaseConfig = {
@@ -268,21 +335,16 @@
     const SCOPES = 'https://www.googleapis.com/auth/drive.file';
     const TARGET_YEARS = [2023, 2024, 2025];
 
-    // State Variables
-    let tokenClient;
-    let accessToken = null;
-    let localDataCache = null;
-    let localViewMode = false;
-    let currentUploadTarget = null;
-    let currentManageTarget = null;
-    let currentHistoryData = null; // For Export History
-    let currentDeviceName = "";
+    // Helpers (Declared Top)
+    window.showLoading = function(msg) { document.getElementById('loadingText').innerText = msg; document.getElementById('loadingMsg').style.display = "flex"; };
+    window.hideLoading = function() { document.getElementById('loadingMsg').style.display = "none"; };
+    window.romanToInt = function(s) { if(!s) return 0; const r = {'I':1,'V':5,'X':10,'L':50}; let n=0; for(let i=0;i<s.length;i++){ if(i+1<s.length && r[s[i]]<r[s[i+1]]) n-=r[s[i]]; else n+=r[s[i]]; } return n; };
+    window.formatNum = function(n) { return n ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "-"; };
+    window.markDeleted = function(el) { el.closest('.manage-item-row').classList.add('d-none', 'marked-delete'); };
 
     // DOM Elements
     const elements = {
         tableBody: document.getElementById('tableBody'),
-        loadingMsg: document.getElementById('loadingMsg'),
-        loadingText: document.getElementById('loadingText'),
         facilityName: document.getElementById('facilityName'),
         editToggle: document.getElementById('editModeToggle'),
         authBtn: document.getElementById('authBtn'),
@@ -292,29 +354,44 @@
         driveInput: document.getElementById('driveUploadInput'),
         loginModal: new bootstrap.Modal(document.getElementById('loginModal')),
         manageModal: new bootstrap.Modal(document.getElementById('manageModal')),
-        historyModal: new bootstrap.Modal(document.getElementById('historyModal'))
+        historyModal: new bootstrap.Modal(document.getElementById('historyModal')),
+        deviceModal: new bootstrap.Modal(document.getElementById('deviceModal'))
     };
 
-    // --- INITIALIZATION ---
+    let tokenClient, accessToken = null, localDataCache = null, localViewMode = false;
+    let currentUploadTarget = null, currentManageTarget = null, currentHistoryData = null, currentCategoryForDevice = null;
+
+    // --- 1. SESSION SECURITY (Logout on Close) ---
+    function checkSessionValidity() {
+        const sessionFlag = sessionStorage.getItem('app_active_session');
+        if (!sessionFlag) {
+            // New tab or browser restart -> Force Logout
+            signOut(auth).then(() => {
+                sessionStorage.setItem('app_active_session', 'true');
+            }).catch(() => {
+                sessionStorage.setItem('app_active_session', 'true');
+            });
+        }
+    }
+
     window.onload = function() {
+        checkSessionValidity(); // Check session on load
         loadAllData();
-        checkPersistentDriveAuth(); // 1. Check saved token
+        checkPersistentDriveAuth();
         
         tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: CLIENT_ID, scope: SCOPES,
             callback: (tokenResponse) => {
                 accessToken = tokenResponse.access_token;
                 if (accessToken) {
-                    // 1. Save Token
                     localStorage.setItem('gdrive_token', accessToken);
-                    localStorage.setItem('gdrive_expiry', Date.now() + 3500 * 1000); // ~1h validity
+                    localStorage.setItem('gdrive_expiry', Date.now() + 3500 * 1000); 
                     updateAuthUI(true);
                 }
             },
         });
     };
 
-    // 1. Persistent Drive Auth Logic
     function checkPersistentDriveAuth() {
         const storedToken = localStorage.getItem('gdrive_token');
         const expiry = localStorage.getItem('gdrive_expiry');
@@ -325,49 +402,45 @@
     }
 
     function updateAuthUI(isLoggedIn) {
-        if(isLoggedIn) {
-            elements.authBtn.style.display = 'none';
-            elements.authStatus.style.display = 'inline-block';
-        }
+        if(isLoggedIn) { elements.authBtn.style.display = 'none'; elements.authStatus.style.display = 'inline-block'; }
     }
 
-    window.handleAuthClick = function() {
-        if (!accessToken) tokenClient.requestAccessToken({prompt: 'consent'});
-    };
+    window.handleAuthClick = function() { if (!accessToken) tokenClient.requestAccessToken({prompt: 'consent'}); };
 
-    // --- 2. FIREBASE LOGIN MODAL LOGIC ---
+    // --- FIREBASE LOGIN ---
     elements.editToggle.addEventListener('click', (e) => {
         if (e.target.checked) {
-            e.preventDefault(); // Stop toggle immediately
-            elements.loginModal.show();
+            if (auth.currentUser) {
+                setEditMode(true);
+            } else {
+                e.preventDefault();
+                elements.loginModal.show();
+            }
         } else {
             setEditMode(false);
         }
     });
 
-    window.closeLoginModal = function() {
-        elements.loginModal.hide();
-        elements.editToggle.checked = false;
-    }
+    window.closeLoginModal = function() { elements.loginModal.hide(); elements.editToggle.checked = false; }
 
     window.handleLogin = async function(e) {
         e.preventDefault();
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
 
-        showLoading("Đang đăng nhập...");
+        window.showLoading("Đang đăng nhập...");
         try {
+            await setPersistence(auth, browserSessionPersistence);
             await signInWithEmailAndPassword(auth, email, password);
             elements.loginModal.hide();
             elements.editToggle.checked = true;
             setEditMode(true);
-            // Clear password field for security
             document.getElementById('loginPassword').value = "";
         } catch (error) {
             alert("Đăng nhập thất bại: " + error.message);
             elements.editToggle.checked = false;
         } finally {
-            hideLoading();
+            window.hideLoading();
         }
     };
 
@@ -383,9 +456,9 @@
         renderTable(localDataCache);
     }
 
-    // --- DATA LOADING & RENDERING ---
+    // --- DATA RENDERING ---
     function loadAllData() {
-        showLoading("Đang tải dữ liệu...");
+        window.showLoading("Đang tải dữ liệu...");
         Promise.all([
             get(ref(db, 'settings/tenCoSo')),
             get(ref(db, 'Quanlythietbi'))
@@ -395,20 +468,31 @@
             elements.facilityName.textContent = name ? name : "..........................";
             renderTable(localDataCache);
         }).catch((error) => { console.error(error); alert("Lỗi tải dữ liệu."); })
-          .finally(() => hideLoading());
+          .finally(() => window.hideLoading());
     }
 
     function renderTable(data) {
         elements.tableBody.innerHTML = "";
         if (!data) { elements.tableBody.innerHTML = "<tr><td colspan='12' class='text-center'>Chưa có dữ liệu</td></tr>"; return; }
 
-        const categories = Object.keys(data).sort((a, b) => romanToInt(a) - romanToInt(b));
+        const categories = Object.keys(data).sort((a, b) => window.romanToInt(a) - window.romanToInt(b));
 
         categories.forEach(catKey => {
             const catData = data[catKey];
             const rowCat = document.createElement('tr');
             rowCat.className = "category-row";
-            rowCat.innerHTML = `<td class="col-stt">${catKey}</td><td colspan="11">${catData.TenPhanLoai || ""}</td>`;
+            
+            if (localViewMode) {
+                rowCat.innerHTML = `<td class="col-stt">${catKey}</td>
+                                    <td colspan="9">${catData.TenPhanLoai || ""}</td>
+                                    <td colspan="2" class="text-center align-middle">
+                                        <button class="btn btn-warning btn-sm fw-bold" style="font-size:11px; padding: 2px 5px;" onclick="openDeviceModal('${catKey}')">
+                                            <i class="fas fa-cog"></i> QL Thiết bị
+                                        </button>
+                                    </td>`;
+            } else {
+                rowCat.innerHTML = `<td class="col-stt">${catKey}</td><td colspan="11">${catData.TenPhanLoai || ""}</td>`;
+            }
             elements.tableBody.appendChild(rowCat);
 
             const itemKeys = Object.keys(catData).filter(k => !isNaN(k)).sort((a,b) => a - b);
@@ -418,7 +502,6 @@
                 const rowItem = document.createElement('tr');
 
                 const createCell = (value, fieldName, isUploadable = false) => {
-                    // History Column
                     if (fieldName === 'LichSuBDSC') {
                         let content = "";
                         if (typeof value === 'object' && value !== null) {
@@ -434,14 +517,10 @@
                         }
                         return content;
                     }
-
-                    // Text Input Columns
                     if (fieldName === 'TenThietBi' || fieldName === 'Tagname') {
                         if (localViewMode) return `<input type="text" class="inline-edit" value="${value || ''}" onchange="updateInline('${catKey}', '${itemKey}', '${fieldName}', this.value)">`;
                         return value || "";
                     }
-
-                    // File/Link Columns
                     let htmlContent = renderMultiLinkList(value);
                     if (localViewMode && isUploadable) {
                          const toolbar = `
@@ -474,224 +553,204 @@
         });
     }
 
-    // --- 3. EXCEL FUNCTIONS (EXPORT / IMPORT) ---
+    // --- OTHER FUNCTIONS ---
+    window.openDeviceModal = function(catKey) {
+        currentCategoryForDevice = catKey;
+        const tbody = document.getElementById('deviceTableBody');
+        tbody.innerHTML = "";
+        const catData = localDataCache[catKey];
+        const itemKeys = Object.keys(catData).filter(k => !isNaN(k)).sort((a,b) => a - b);
+        itemKeys.forEach(key => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td class="text-center fw-bold">${key}</td><td>${catData[key].TenThietBi || "(Chưa đặt tên)"}</td><td class="text-center"><button class="btn btn-danger btn-sm" style="font-size: 10px;" onclick="deleteDevice('${catKey}', '${key}')"><i class="fas fa-trash"></i></button></td>`;
+            tbody.appendChild(tr);
+        });
+        document.getElementById('newDeviceName').value = "";
+        elements.deviceModal.show();
+    };
+
+    window.addNewDevice = async function() {
+        if(!currentCategoryForDevice) return;
+        const name = document.getElementById('newDeviceName').value.trim();
+        if(!name) { alert("Vui lòng nhập tên thiết bị"); return; }
+        const catData = localDataCache[currentCategoryForDevice];
+        const itemKeys = Object.keys(catData).filter(k => !isNaN(k)).map(k => parseInt(k));
+        const newId = itemKeys.length > 0 ? Math.max(...itemKeys) + 1 : 1;
+        window.showLoading("Đang thêm...");
+        try {
+            await set(ref(db, `Quanlythietbi/${currentCategoryForDevice}/${newId}`), { TenThietBi: name, Tagname: "" });
+            if(!localDataCache[currentCategoryForDevice]) localDataCache[currentCategoryForDevice] = {};
+            localDataCache[currentCategoryForDevice][newId] = { TenThietBi: name };
+            openDeviceModal(currentCategoryForDevice); renderTable(localDataCache);
+        } catch(err) { alert("Lỗi: " + err.message); } finally { window.hideLoading(); }
+    };
+
+    window.deleteDevice = async function(catKey, itemKey) {
+        if(!confirm(`Bạn chắc chắn muốn xoá thiết bị STT ${itemKey}?`)) return;
+        window.showLoading("Đang xoá...");
+        try {
+            await remove(ref(db, `Quanlythietbi/${catKey}/${itemKey}`));
+            delete localDataCache[catKey][itemKey];
+            openDeviceModal(catKey); renderTable(localDataCache);
+        } catch(err) { alert("Lỗi: " + err.message); } finally { window.hideLoading(); }
+    };
+
+    window.openManageModal = function(catKey, itemKey, fieldName) {
+        currentManageTarget = { catKey, itemKey, fieldName };
+        const container = document.getElementById('manageListContainer'); container.innerHTML = "";
+        let data = localDataCache[catKey][itemKey][fieldName];
+        let items = [];
+        if (data) { if (typeof data === 'string') items = [{ name: "Link cũ", url: data }]; else if (Array.isArray(data)) items = [...data]; else if (typeof data === 'object') items = Object.values(data); }
+        
+        if(items.length === 0) container.innerHTML = "<div class='text-center text-muted'>Trống</div>";
+        else {
+            items.forEach((item, index) => {
+                const displayName = item.name || "File";
+                const row = document.createElement('div'); row.className = "manage-item-row";
+                row.innerHTML = `<input type="text" class="form-control form-control-sm" value="${displayName}" id="linkName-${index}"><a href="${item.url}" target="_blank"><i class="fas fa-external-link-alt"></i></a><i class="fas fa-trash-alt manage-item-del" onclick="markDeleted(this)"></i><input type="hidden" id="linkUrl-${index}" value="${item.url}"><input type="hidden" id="linkCreated-${index}" value="${item.created || Date.now()}">`;
+                container.appendChild(row);
+            });
+        }
+        elements.manageModal.show();
+    };
+
+    window.saveManageChanges = async function() {
+        if (!currentManageTarget) return;
+        const { catKey, itemKey, fieldName } = currentManageTarget;
+        const rows = document.querySelectorAll('#manageListContainer .manage-item-row');
+        const newData = [];
+        rows.forEach((row, index) => {
+            if (row.classList.contains('marked-delete')) return;
+            const name = row.querySelector(`#linkName-${index}`).value;
+            const url = row.querySelector(`#linkUrl-${index}`).value;
+            const created = row.querySelector(`#linkCreated-${index}`).value;
+            if (url) newData.push({ name: name || "File", url: url, created: parseInt(created) });
+        });
+        window.showLoading("Đang lưu...");
+        try {
+            await set(ref(db, `Quanlythietbi/${catKey}/${itemKey}/${fieldName}`), newData);
+            if (!localDataCache[catKey][itemKey]) localDataCache[catKey][itemKey] = {};
+            localDataCache[catKey][itemKey][fieldName] = newData;
+            renderTable(localDataCache); elements.manageModal.hide();
+        } catch(err) { alert(err.message); } finally { window.hideLoading(); }
+    };
+
+    window.viewHistoryDetail = function(catKey, itemKey) {
+        currentHistoryData = localDataCache[catKey][itemKey]['LichSuBDSC'];
+        const devName = localDataCache[catKey][itemKey]['TenThietBi'];
+        const container = document.getElementById('historyModalBody'); container.innerHTML = "";
+        document.getElementById('historyModalTitle').innerText = `Lịch sử: ${devName}`;
+
+        if(!currentHistoryData) { container.innerHTML = "Trống"; elements.historyModal.show(); return; }
+        
+        Object.keys(currentHistoryData).sort().reverse().forEach(year => {
+            let html = `<div class="history-year-block"><div class="history-year-title">Năm ${year}</div>`;
+            Object.values(currentHistoryData[year]).forEach(t => {
+                html += `<div class="mb-2"><strong>${t.noiDung}</strong>`;
+                if(t.details) {
+                    html += `<table class="history-detail-table">
+                                <thead><tr>
+                                    <th class="col-hist-date">Ngày</th>
+                                    <th class="col-hist-unit">ĐVT</th>
+                                    <th class="col-hist-price">Đơn giá</th>
+                                    <th class="col-hist-total">Thành tiền</th>
+                                    <th class="col-hist-link">HS</th>
+                                </tr></thead><tbody>`;
+                    Object.values(t.details).forEach(d => {
+                        html += `<tr>
+                                    <td class="text-center">${d.ngayThucHien}</td>
+                                    <td class="text-center">${d.dvt}</td>
+                                    <td class="text-end">${window.formatNum(d.donGia)}</td>
+                                    <td class="text-end fw-bold">${window.formatNum(d.thanhTien)}</td>
+                                    <td class="text-center">${d.hoSoLink ? '<a href="'+d.hoSoLink+'" target="_blank"><i class="fas fa-file-alt"></i></a>' : '-'}</td>
+                                 </tr>`;
+                    });
+                    html += `</tbody></table>`;
+                }
+                html += `</div>`;
+            });
+            container.innerHTML += html + "</div>";
+        });
+        elements.historyModal.show();
+    };
+
+    window.updateInline = function(c, i, f, v) { update(ref(db, `Quanlythietbi/${c}/${i}`), {[f]:v}); localDataCache[c][i][f]=v; };
     
-    // Export Main Data (Minus History)
     window.exportMainData = function() {
         if (!localDataCache) return;
-        const rows = [];
-        // Header
-        rows.push(["STT", "Tên thiết bị", "Tagname", "Thông số KT", "Catalogue", "Kiểm định", "Quy trình VH", "Quy trình BD", "Định mức", "ĐGRR", "Biểu mẫu"]);
-
-        Object.keys(localDataCache).sort((a,b)=>romanToInt(a)-romanToInt(b)).forEach(catKey => {
-            rows.push([catKey, localDataCache[catKey].TenPhanLoai]); // Category Row
+        const rows = [["STT", "Tên thiết bị", "Tagname", "Thông số KT", "Catalogue", "Kiểm định", "Quy trình VH", "Quy trình BD", "Định mức", "ĐGRR", "Biểu mẫu"]];
+        Object.keys(localDataCache).sort((a,b)=>window.romanToInt(a)-window.romanToInt(b)).forEach(catKey => {
+            rows.push([catKey, localDataCache[catKey].TenPhanLoai]); 
             const items = localDataCache[catKey];
             Object.keys(items).filter(k=>!isNaN(k)).sort((a,b)=>a-b).forEach(key => {
                 const i = items[key];
-                // Helper to get raw string from link object
-                const getVal = (v) => {
-                    if(typeof v === 'string') return v;
-                    if(Array.isArray(v)) return v.map(x=>x.url).join('; ');
-                    return "";
-                };
-                rows.push([
-                    key, i.TenThietBi, i.Tagname, 
-                    getVal(i.ThongSoKT), getVal(i.Catalogue), getVal(i.KiemDinh),
-                    getVal(i.QuyTrinhVH), getVal(i.QuyTrinhBD), getVal(i.DinhMuc),
-                    getVal(i.DGRR), getVal(i.BieuMau)
-                ]);
+                const getVal = (v) => (typeof v === 'string') ? v : (Array.isArray(v) ? v.map(x=>x.url).join(';') : "");
+                rows.push([key, i.TenThietBi, i.Tagname, getVal(i.ThongSoKT), getVal(i.Catalogue), getVal(i.KiemDinh), getVal(i.QuyTrinhVH), getVal(i.QuyTrinhBD), getVal(i.DinhMuc), getVal(i.DGRR), getVal(i.BieuMau)]);
             });
         });
-
-        const ws = XLSX.utils.aoa_to_sheet(rows);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "DanhSachThietBi");
-        XLSX.writeFile(wb, "Backup_ThietBi_LPG.xlsx");
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), "DS"); XLSX.writeFile(wb, "Backup.xlsx");
     };
 
-    // Import Data (Merge Logic)
-    document.getElementById('fileInputExcel').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if(!file) return;
-        showLoading("Đang xử lý nhập liệu...");
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const wb = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
-                const ws = wb.Sheets[wb.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(ws, {header: 1, defval: ""});
-                processMergeExcel(jsonData);
-            } catch (err) { alert(err.message); hideLoading(); }
-        };
-        reader.readAsArrayBuffer(file);
-        e.target.value = ""; // Reset
-    });
-
-    function processMergeExcel(rows) {
-        // Find Header
-        let headerRow = -1;
-        for(let i=0; i<rows.length; i++) {
-            const str = rows[i].join(" ").toUpperCase();
-            if(str.includes("STT") && str.includes("TÊN")) { headerRow = i; break; }
-        }
-        if(headerRow === -1) throw new Error("Không tìm thấy dòng tiêu đề (STT, Tên thiết bị...)");
-
-        const headers = rows[headerRow].map(h => h.toString().trim().toUpperCase());
-        // Mapping Header Index
-        const mapIdx = {
-            stt: headers.indexOf("STT"),
-            ten: headers.findIndex(h => h.includes("TÊN")),
-            tag: headers.findIndex(h => h.includes("TAGNAME")),
-            // Map other cols if needed
-        };
-
-        let currentCat = null;
-        const newData = JSON.parse(JSON.stringify(localDataCache || {})); // Clone
-
-        for(let i=headerRow+1; i<rows.length; i++) {
-            const row = rows[i];
-            const stt = row[mapIdx.stt] ? row[mapIdx.stt].toString().trim() : "";
-            if(!stt) continue;
-
-            if(isRoman(stt)) {
-                currentCat = stt;
-                if(!newData[currentCat]) newData[currentCat] = { TenPhanLoai: row[mapIdx.ten] || "" };
-            } else if(!isNaN(stt) && currentCat) {
-                if(!newData[currentCat][stt]) newData[currentCat][stt] = {}; // Init if new
-                const item = newData[currentCat][stt];
-                
-                // Merge logic: Only update if col exists in excel
-                if(mapIdx.ten > -1) item.TenThietBi = row[mapIdx.ten];
-                if(mapIdx.tag > -1) item.Tagname = row[mapIdx.tag];
-                // Keep other fields (LichSuBDSC, Links) intact
-            }
-        }
-
-        set(ref(db, 'Quanlythietbi'), newData)
-            .then(() => { alert("Đã nhập dữ liệu thành công (Chế độ gộp)!"); loadAllData(); })
-            .finally(() => hideLoading());
-    }
-
-    // 4. Export History Logic
-    window.exportCurrentHistory = function() {
-        if(!currentHistoryData) return;
-        const rows = [["Năm", "Nội dung", "Ngày thực hiện", "Lần TH", "ĐVT", "Đơn giá", "Thành tiền", "Link Hồ Sơ"]];
-        
-        // Flatten
-        const flatList = [];
-        Object.keys(currentHistoryData).forEach(year => {
-            const tasks = currentHistoryData[year];
-            Object.values(tasks).forEach(task => {
-                const noiDung = task.noiDung;
-                if(task.details) {
-                    Object.values(task.details).forEach(d => {
-                        flatList.push({
-                            year: year,
-                            content: noiDung,
-                            date: d.ngayThucHien,
-                            lan: d.lanThucHien,
-                            dvt: d.dvt,
-                            price: d.donGia,
-                            total: d.thanhTien,
-                            link: d.hoSoLink || ""
-                        });
-                    });
-                }
-            });
-        });
-
-        // Sort by Date
-        flatList.sort((a,b) => {
-            // Simple date parse dd/mm/yyyy
-            const parseD = (s) => {
-                if(!s) return 0;
-                const parts = s.split('/');
-                return new Date(parts[2], parts[1]-1, parts[0]).getTime();
-            };
-            return parseD(a.date) - parseD(b.date);
-        });
-
-        flatList.forEach(item => {
-            rows.push([item.year, item.content, item.date, item.lan, item.dvt, item.price, item.total, item.link]);
-        });
-
-        const ws = XLSX.utils.aoa_to_sheet(rows);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "LichSu_" + currentDeviceName.substring(0,20));
-        XLSX.writeFile(wb, `LichSu_${currentDeviceName}.xlsx`);
-    };
-
-    // --- 5 & 6. BATCH COLLECTION & LOCKED YEARS ---
-    window.batchCollectBDSC = async function() {
-        if(!confirm("Bạn có chắc muốn cập nhật lịch sử cho TOÀN BỘ thiết bị? Quá trình này có thể mất vài phút.")) return;
-        
-        showLoading("Đang kiểm tra cài đặt...");
+    window.collectBDSC = async function(catKey, itemKey, tagName) {
+        if (!tagName) { alert("Chưa có Tagname!"); return; }
+        window.showLoading("Đang quét...");
         try {
-            // 6. Check Locked Years
             const lockedSnapshot = await get(ref(db, 'settings/global/lockedYears'));
             const lockedYears = lockedSnapshot.val() || {};
             const activeYears = TARGET_YEARS.filter(y => lockedYears[y] !== true);
-
-            if(activeYears.length === 0) {
-                alert("Tất cả các năm mục tiêu đều đã bị khóa!");
-                return;
+            let collectedData = {}; let found = false;
+            for (let year of activeYears) {
+                const snapshot = await get(ref(db, `congViecMe${year}`));
+                if (!snapshot.exists()) continue;
+                const sourceMap = { [year]: snapshot.val() };
+                const res = searchHistoryInMemory(sourceMap, tagName);
+                if(res) { collectedData[year] = res[year]; found = true; }
             }
+            if (found) {
+                const current = localDataCache[catKey][itemKey].LichSuBDSC || {};
+                Object.assign(current, collectedData);
+                await update(ref(db, `Quanlythietbi/${catKey}/${itemKey}`), { LichSuBDSC: current });
+                localDataCache[catKey][itemKey]['LichSuBDSC'] = current;
+                renderTable(localDataCache);
+                alert("Đã thu thập!");
+            } else alert("Không tìm thấy dữ liệu mới.");
+        } catch (e) { alert(e.message); } finally { window.hideLoading(); }
+    };
 
-            // Fetch Source Data Once to optimize
+    window.batchCollectBDSC = async function() {
+        if(!confirm("Cập nhật TOÀN BỘ?")) return;
+        window.showLoading("Đang xử lý...");
+        try {
+            const lockedSnapshot = await get(ref(db, 'settings/global/lockedYears'));
+            const lockedYears = lockedSnapshot.val() || {};
+            const activeYears = TARGET_YEARS.filter(y => lockedYears[y] !== true);
             const sourceData = {};
             for(let year of activeYears) {
-                showLoading(`Đang tải dữ liệu nguồn năm ${year}...`);
                 const snap = await get(ref(db, `congViecMe${year}`));
                 if(snap.exists()) sourceData[year] = snap.val();
             }
-
-            // Iterate and Update
             const updates = {};
-            let count = 0;
-
             for(const catKey in localDataCache) {
                 const items = localDataCache[catKey];
                 for(const itemKey in items) {
                     if(isNaN(itemKey)) continue;
                     const item = items[itemKey];
                     if(!item.Tagname) continue;
-
-                    // Search Logic (Optimized for Memory)
-                    const foundHistory = searchHistoryInMemory(sourceData, item.Tagname);
-                    
-                    if(foundHistory) {
-                        // Merge with existing history (Keep old years if not in activeYears)
-                        const currentHistory = item.LichSuBDSC || {};
-                        // Add new found data
-                        Object.assign(currentHistory, foundHistory);
-                        
-                        updates[`Quanlythietbi/${catKey}/${itemKey}/LichSuBDSC`] = currentHistory;
-                        count++;
+                    const found = searchHistoryInMemory(sourceData, item.Tagname);
+                    if(found) {
+                        const current = item.LichSuBDSC || {};
+                        Object.assign(current, found);
+                        updates[`Quanlythietbi/${catKey}/${itemKey}/LichSuBDSC`] = current;
                     }
                 }
             }
-
-            if(Object.keys(updates).length > 0) {
-                showLoading(`Đang lưu ${count} bản ghi...`);
-                await update(ref(db), updates);
-                await loadAllData();
-                alert(`Cập nhật thành công ${count} thiết bị!`);
-            } else {
-                alert("Không tìm thấy dữ liệu mới nào.");
-            }
-
-        } catch(err) {
-            console.error(err);
-            alert("Lỗi: " + err.message);
-        } finally {
-            hideLoading();
-        }
+            if(Object.keys(updates).length > 0) { await update(ref(db), updates); await loadAllData(); alert("Xong!"); } 
+            else alert("Không có dữ liệu mới.");
+        } catch(e) { alert(e.message); } finally { window.hideLoading(); }
     };
 
     function searchHistoryInMemory(sourceData, tagName) {
-        let result = {};
-        let hasData = false;
-        
+        let result = {}; let hasData = false;
         for(const [year, yearData] of Object.entries(sourceData)) {
             for(const gData of Object.values(yearData)) {
                 if(!gData.children) continue;
@@ -699,26 +758,17 @@
                     if(!cData.grandchildren) continue;
                     for(const [grandId, grData] of Object.entries(cData.grandchildren)) {
                         if(grData.tagName === tagName && grData.daThucHien === true && grData.greatGrandchildren) {
-                            
                             if(!result[year]) result[year] = {};
-
                             for(const [ggId, ggData] of Object.entries(grData.greatGrandchildren)) {
                                 if(ggData.executions) {
                                     const entryId = `${grandId}_${ggId}`;
                                     const details = {};
-                                    for(const [k, v] of Object.entries(ggData.executions)) {
-                                        if(!isNaN(k) && typeof v === 'object') {
-                                            details[k] = {
-                                                donGia: v.donGia||"", dvt: v.dvt||"", lanThucHien: v.lanThucHien||"",
-                                                ngayThucHien: v.ngayThucHien||"", thanhTien: v.thanhTien||"", hoSoLink: v.hoSoLink||""
-                                            };
-                                        }
-                                    }
+                                    for(const [k, v] of Object.entries(ggData.executions)) { if(!isNaN(k) && typeof v === 'object') details[k] = v; }
                                     result[year][entryId] = { noiDung: ggData.noiDung || "N/A", details: details };
                                     hasData = true;
                                 }
                             }
-                            break; // Found tag in this branch
+                            break;
                         }
                     }
                 }
@@ -727,177 +777,59 @@
         return hasData ? result : null;
     }
 
-    // --- SINGLE COLLECT (With Lock Check) ---
-    window.collectBDSC = async function(catKey, itemKey, tagName) {
-        if (!tagName) { alert("Chưa có Tagname!"); return; }
-        showLoading(`Đang quét dữ liệu cho Tag: ${tagName}...`);
-        
-        try {
-            const lockedSnapshot = await get(ref(db, 'settings/global/lockedYears'));
-            const lockedYears = lockedSnapshot.val() || {};
-            const activeYears = TARGET_YEARS.filter(y => lockedYears[y] !== true);
-            
-            // Re-use the batch logic but for single item and fetching from DB directly
-            let collectedData = {};
-            let found = false;
-
-            for (let year of activeYears) {
-                const snapshot = await get(ref(db, `congViecMe${year}`));
-                if (!snapshot.exists()) continue;
-                const sourceMap = { [year]: snapshot.val() };
-                const res = searchHistoryInMemory(sourceMap, tagName);
-                if(res) {
-                    collectedData[year] = res[year];
-                    found = true;
-                }
-            }
-
-            if (found) {
-                // Merge with existing to avoid deleting locked years data
-                const current = localDataCache[catKey][itemKey].LichSuBDSC || {};
-                Object.assign(current, collectedData);
-
-                await update(ref(db, `Quanlythietbi/${catKey}/${itemKey}`), { LichSuBDSC: current });
-                localDataCache[catKey][itemKey]['LichSuBDSC'] = current;
-                renderTable(localDataCache);
-                alert("Đã thu thập dữ liệu thành công!");
-            } else {
-                alert(`Không tìm thấy dữ liệu mới (Các năm bị khóa sẽ bị bỏ qua).`);
-            }
-        } catch (error) { alert("Lỗi: " + error.message); } 
-        finally { hideLoading(); }
-    };
-
-    // --- VIEW HISTORY ---
-    window.viewHistoryDetail = function(catKey, itemKey) {
-        currentHistoryData = localDataCache[catKey][itemKey]['LichSuBDSC'];
-        currentDeviceName = localDataCache[catKey][itemKey]['TenThietBi'] || "Device";
-        
-        document.getElementById('historyModalTitle').innerText = `Lịch sử: ${currentDeviceName}`;
-        const container = document.getElementById('historyModalBody');
-        container.innerHTML = "";
-
-        if (!currentHistoryData || typeof currentHistoryData !== 'object') {
-            container.innerHTML = "<p class='text-center'>Chưa có dữ liệu.</p>";
-            elements.historyModal.show();
-            return;
-        }
-
-        Object.keys(currentHistoryData).sort().reverse().forEach(year => {
-            const yearBlock = document.createElement('div');
-            yearBlock.className = 'history-year-block';
-            let html = `<div class="history-year-title"><i class="far fa-calendar-alt"></i> Năm ${year}</div>`;
-            
-            const tasks = currentHistoryData[year];
-            Object.values(tasks).forEach(task => {
-                html += `<div class="mb-3 ps-2 border-start border-3 border-primary">
-                            <div class="fw-bold text-dark mb-1">${task.noiDung}</div>`;
-                if (task.details) {
-                    html += `<table class="history-detail-table">
-                                <thead><tr><th>Ngày</th><th>ĐVT</th><th>Đơn giá</th><th>Thành tiền</th><th>Hồ sơ</th></tr></thead><tbody>`;
-                    Object.values(task.details).forEach(d => {
-                        const link = d.hoSoLink ? `<a href="${d.hoSoLink}" target="_blank" class="fw-bold text-success">Xem</a>` : "-";
-                        html += `<tr>
-                                    <td class="text-center">${d.ngayThucHien}</td>
-                                    <td class="text-center">${d.dvt}</td>
-                                    <td class="text-end">${formatNum(d.donGia)}</td>
-                                    <td class="text-end fw-bold">${formatNum(d.thanhTien)}</td>
-                                    <td class="text-center">${link}</td>
-                                 </tr>`;
-                    });
-                    html += `</tbody></table>`;
-                }
-                html += `</div>`;
-            });
-            yearBlock.innerHTML = html;
-            container.appendChild(yearBlock);
-        });
-        elements.historyModal.show();
-    };
-
-    // --- HELPERS (Common) ---
-    function showLoading(msg) { elements.loadingText.innerText = msg; elements.loadingMsg.style.display = "flex"; }
-    function hideLoading() { elements.loadingMsg.style.display = "none"; }
-    function formatNum(n) { return n ? n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "-"; }
-    function romanToInt(s) { if(!s) return 0; const r = {'I':1,'V':5,'X':10,'L':50}; let n=0; for(let i=0;i<s.length;i++){ if(i+1<s.length && r[s[i]]<r[s[i+1]]) n-=r[s[i]]; else n+=r[s[i]]; } return n; }
-    function isRoman(s) { return /^M{0,4}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/i.test(s.toString().trim()) && isNaN(s); }
-
-    // --- DRIVE UPLOAD & EDIT LOGIC (Previous functions simplified) ---
-    // (Giữ nguyên logic upload, updateInline, renderMultiLinkList như code cũ, chỉ update UI)
-    window.updateInline = function(c, i, f, v) { update(ref(db, `Quanlythietbi/${c}/${i}`), {[f]:v}); localDataCache[c][i][f]=v; };
-    
-    function renderMultiLinkList(d) {
-        if(!d || typeof d !== 'object' || Array.isArray(d)===false && !d.url) return "";
-        let items = Array.isArray(d) ? [...d].reverse() : (d.url ? [d] : []); 
-        // Filter out history object if mistakenly passed
-        if(!Array.isArray(d) && d.noiDung) return "";
-
-        if(items.length===0) return "";
-        let h = '<div class="multi-link-box">';
-        items.forEach(l => {
-            if(l.url) h+=`<div class="link-item"><i class="fas fa-caret-right text-muted" style="font-size:10px;"></i> <a href="${l.url}" target="_blank" title="${l.name}">${l.name||"File"}</a></div>`;
-        });
-        return h + '</div>';
-    }
-
-    // Modal Manager & Upload Handlers (Briefly kept for functionality)
-    window.openManageModal = function(c,i,f) {
-        currentManageTarget = {c,i,f};
-        const con = document.getElementById('manageListContainer'); con.innerHTML="";
-        let d = localDataCache[c][i][f];
-        let items = Array.isArray(d) ? d : (d && d.url ? [d] : []);
-        items.forEach((it, idx) => {
-            con.innerHTML += `<div class="manage-item-row">
-                <input class="form-control form-control-sm" value="${it.name||''}" onchange="tempUpdateName(${idx}, this.value)">
-                <a href="${it.url}" target="_blank"><i class="fas fa-external-link-alt"></i></a>
-                <i class="fas fa-trash-alt manage-item-del" onclick="tempMarkDel(this)"></i>
-            </div>`;
-        });
-        elements.manageModal.show();
-    };
-    // Note: Due to length limit, assume saveManageChanges, triggerUpload, etc. are same as previous versions but adapted to this UI.
-    
-    // Add missing parts for completeness in real file:
-    window.triggerUpload = function(c,i,f) {
-        if(!accessToken) { alert("Vui lòng đăng nhập Drive!"); return; }
-        currentUploadTarget={c,i,f}; elements.driveInput.click();
-    };
+    window.triggerUpload = function(c,i,f) { if(!accessToken) { alert("Login Drive!"); return; } currentUploadTarget={c,i,f}; elements.driveInput.click(); };
     elements.driveInput.addEventListener('change', async(e)=>{
         const f=e.target.files[0]; if(!f) return;
         const {c,i,f:fd} = currentUploadTarget;
-        const name = prompt("Tên file:", f.name); if(!name) return;
-        showLoading("Uploading...");
-        // ... Drive Upload Fetch Logic Here (Same as before) ...
-        // mocking success:
+        const name = prompt("Tên:", f.name); if(!name) return;
+        window.showLoading("Uploading...");
         const meta = { 'name': f.name, 'mimeType': f.type, 'parents': [FOLDER_ID] };
-        const form = new FormData(); 
-        form.append('metadata', new Blob([JSON.stringify(meta)], {type:'application/json'}));
-        form.append('file', f);
+        const form = new FormData(); form.append('metadata', new Blob([JSON.stringify(meta)], {type:'application/json'})); form.append('file', f);
         try {
             const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink', {
                 method:'POST', headers:{'Authorization':'Bearer '+accessToken}, body:form});
             const res = await r.json();
-            const newObj = {name: name, url: res.webViewLink, created: Date.now()};
-            
-            // Append Logic
-            let arr = localDataCache[c][i][fd] || [];
-            if(!Array.isArray(arr)) arr = arr.url ? [arr] : [];
-            arr.push(newObj);
+            let arr = localDataCache[c][i][fd] || []; if(!Array.isArray(arr)) arr = arr.url ? [arr] : [];
+            arr.push({name: name, url: res.webViewLink, created: Date.now()});
             await set(ref(db, `Quanlythietbi/${c}/${i}/${fd}`), arr);
-            localDataCache[c][i][fd] = arr;
-            renderTable(localDataCache);
-        } catch(e){ alert(e.message); } finally { hideLoading(); elements.driveInput.value=""; }
+            localDataCache[c][i][fd] = arr; renderTable(localDataCache);
+        } catch(e){ alert(e.message); } finally { window.hideLoading(); elements.driveInput.value=""; }
     });
 
     window.triggerManualLink = async function(c,i,f) {
-        const u = prompt("Link:"); if(!u) return;
-        const n = prompt("Tên:"); if(!n) return;
-        let arr = localDataCache[c][i][f] || [];
-        if(!Array.isArray(arr)) arr = arr.url ? [arr] : [];
+        const u = prompt("Link:"); if(!u) return; const n = prompt("Tên:"); if(!n) return;
+        let arr = localDataCache[c][i][f] || []; if(!Array.isArray(arr)) arr = arr.url ? [arr] : [];
         arr.push({name:n, url:u, created: Date.now()});
-        await set(ref(db, `Quanlythietbi/${c}/${i}/${f}`), arr);
-        localDataCache[c][i][f] = arr; renderTable(localDataCache);
+        await set(ref(db, `Quanlythietbi/${c}/${i}/${f}`), arr); localDataCache[c][i][f] = arr; renderTable(localDataCache);
     };
+
+    window.exportCurrentHistory = function() {
+        if(!currentHistoryData) return;
+        const rows = [["Năm", "Nội dung", "Ngày", "ĐVT", "Đơn giá", "Thành tiền", "Link"]];
+        const flat = [];
+        Object.keys(currentHistoryData).forEach(y => {
+            Object.values(currentHistoryData[y]).forEach(t => {
+                if(t.details) Object.values(t.details).forEach(d => flat.push({y, c:t.noiDung, ...d}));
+            });
+        });
+        flat.sort((a,b) => (a.ngayThucHien||"").localeCompare(b.ngayThucHien||""));
+        flat.forEach(i => rows.push([i.y, i.c, i.ngayThucHien, i.dvt, i.donGia, i.thanhTien, i.hoSoLink]));
+        const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), "History"); XLSX.writeFile(wb, "History.xlsx");
+    };
+
+    // --- REVERTED TOOLTIP LOGIC (Use 'title' attribute) ---
+    function renderMultiLinkList(d) {
+        if(!d || typeof d !== 'object' || (!Array.isArray(d) && !d.url)) return "";
+        let items = Array.isArray(d) ? [...d].reverse() : [d];
+        if(!Array.isArray(d) && d.noiDung) return ""; 
+        if(items.length===0) return "";
+        let h = '<div class="multi-link-box">';
+        items.forEach(l => { 
+            // Use browser native tooltip (title)
+            if(l.url) h+=`<div class="link-item"><i class="fas fa-caret-right text-muted" style="font-size:10px;"></i> <a href="${l.url}" target="_blank" title="${l.name||"File"}">${l.name||"File"}</a></div>`; 
+        });
+        return h + '</div>';
+    }
 </script>
 </body>
 </html>
